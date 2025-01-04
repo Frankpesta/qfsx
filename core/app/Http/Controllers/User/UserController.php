@@ -34,59 +34,62 @@ class UserController extends Controller
 
         $user = auth()->user();
 
-        //added feature - 10th Oct 2023
-        $widget['xlm_bal'] = $user->xlm_bal;
-        $widget['xrp_bal'] = $user->xrp_bal;
-        $widget['algo_bal'] = $user->algo_bal;
-        $widget['eth_bal'] = $user->eth_bal;
-        $widget['tron_bal'] = $user->tron_bal;
-        $widget['xdc_bal'] = $user->xdc_bal;
-        $widget['usdt_bal'] = $user->usdt_bal;
-        $widget['total_bal'] = $widget['xlm_bal'] + $widget['xrp_bal'] + $widget['eth_bal'] + $widget['algo_bal'] + $widget['tron_bal'] + $widget['usdt_bal'] + $widget['xdc_bal'];
-        //added feature - 10th Oct 2023
+        $widget['xlm_bal'] = $user->xlm_bal ?? 0;
+        $widget['xrp_bal'] = $user->xrp_bal ?? 0;
+        $widget['algo_bal'] = $user->algo_bal ?? 0;
+        $widget['eth_bal'] = $user->eth_bal ?? 0;
+        $widget['btc_bal'] = $user->btc_bal ?? 0;
+        $widget['total_bal'] = $widget['xlm_bal'] + $widget['xrp_bal'] + $widget['eth_bal'] + $widget['algo_bal'] + $widget['btc_bal'];
 
         $widget['investments'] = Investment::where('user_id', $user->id)->count();
         $widget['withdrawals'] = Withdrawal::where('user_id', $user->id)->count();
         $widget['referred'] = User::where('ref_by', $user->id)->count();
-        $widget['transactions'] = Transaction::orderBy('id', 'desc')->where('user_id', $user->id)->count();
-        $transactions = Transaction::orderBy('id', 'desc')->where('user_id', $user->id)->with('currency')->take(10)->get();
+        $widget['transactions'] = Transaction::where('user_id', $user->id)->count();
+
+        $transactions = Transaction::where('user_id', $user->id)->with('currency')->latest()->take(10)->get();
         $vendors = Vendor::select('id', 'name', 'url')->get();
         $coins = Coin::select('id', 'name', 'symbol', 'wallet_address')->get();
 
         $cryptoBalances = [
-            'xlm' => $user->xlm_bal,
-            'xrp' => $user->xrp_bal,
-            'algo' => $user->algo_bal,
-            'eth' => $user->eth_bal,
-            'tron' => $user->tron_bal,
-            'xdc' => $user->xdc_bal,
-            'usdt' => $user->usdt_bal,
+            'xlm' => $user->xlm_bal ?? 0,
+            'xrp' => $user->xrp_bal ?? 0,
+            'algo' => $user->algo_bal ?? 0,
+            'eth' => $user->eth_bal ?? 0,
+            'btc' => $user->btc_bal ?? 0,
         ];
-        // Base API endpoint for CoinConvert
+
         $baseApiEndpoint = 'https://api.coinconvert.net/convert';
 
-        // Fetch exchange rates for each cryptocurrency
         $dollarValues = [];
         foreach ($cryptoBalances as $crypto => $balance) {
-            $apiEndpoint = "{$baseApiEndpoint}/{$crypto}/usd?amount=1"; // Use amount=1 for conversion rate
+            $apiEndpoint = "{$baseApiEndpoint}/{$crypto}/usd?amount=1";
 
-            $response = Http::get($apiEndpoint);
-
-            if ($response->successful()) {
-                $exchangeRate = $response->json()['USD']; // Use the correct key "USD"
-                $dollarValues[$crypto] = $balance * $exchangeRate;
-            } else {
-                // Handle API request error
-                // You might want to log the error or provide a default exchange rate
+            try {
+                $response = Http::timeout(10)->get($apiEndpoint);
+                if ($response->successful() && isset($response->json()['USD'])) {
+                    $exchangeRate = $response->json()['USD'];
+                    $dollarValues[$crypto] = $balance * $exchangeRate;
+                } else {
+                    $dollarValues[$crypto] = 0;
+                }
+            } catch (\Exception $e) {
+                \Log::error('API request error', ['error' => $e->getMessage(), 'url' => $apiEndpoint]);
                 $dollarValues[$crypto] = 0;
             }
         }
 
-        // Total dollar value
         $totalDollarValue = array_sum($dollarValues);
 
-
-        return view($this->activeTemplate . 'user.dashboard', compact('pageTitle', 'widget', 'transactions', 'cryptoBalances', 'dollarValues', 'totalDollarValue', 'vendors', 'coins'));
+        return view($this->activeTemplate . 'user.dashboard', compact(
+            'pageTitle',
+            'widget',
+            'transactions',
+            'cryptoBalances',
+            'dollarValues',
+            'totalDollarValue',
+            'vendors',
+            'coins'
+        ));
     }
 
     public function show2faForm()

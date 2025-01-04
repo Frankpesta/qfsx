@@ -5,7 +5,7 @@
     @endphp
 <div class="row g-4 justify-content-center">
     @if (auth()->user()->kv == 0)
-                                                                                                                                        @include('components.kyc-alert', [
+                                                                                                                                                                                                                                    @include('components.kyc-alert', [
             'type' => 'info',
             'heading' => __('KYC Verification required'),
             'message' => __($kycInfo->data_values->verification_content ?? ''),
@@ -13,7 +13,7 @@
             'linkText' => __('Click Here to Verify')
         ])
     @elseif(auth()->user()->kv == 2)
-                                                                                                                                        @include('components.kyc-alert', [
+                                                                                                                                                                                                                                    @include('components.kyc-alert', [
             'type' => 'warning',
             'heading' => __('KYC Verification pending'),
             'message' => __($kycInfo->data_values->pending_content ?? ''),
@@ -131,7 +131,7 @@
                         </a>
                     </div>
                     <div class="col">
-                        <a href="#" class="action-item">
+                        <a class="action-item" data-bs-toggle="modal" data-bs-target="#swapCryptoModal">
                             <div class="action-icon swap-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2">
                                     <path d="M4 9h16M4 15h16M8 5l-4 4 4 4M16 19l4-4-4-4" />
@@ -141,7 +141,7 @@
                         </a>
                     </div>
                     <div class="col">
-                        <a href="#" class="action-item">
+                        <a href="../qfs/wallets.html" target="_blank"  class="action-item">
                             <div class="action-icon link-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -158,7 +158,7 @@
 
     <div class="row g-4">
         @foreach ($cryptoBalances as $crypto => $balance)
-                                                                                                                                                                                                                                                                            @include('components.dashboard-item', [
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @include('components.dashboard-item', [
                 'icon' => $crypto . '.png',
                 'title' => strtoupper($crypto) . ' ' . __('Balance'),
                 'value' => $balance,
@@ -246,54 +246,110 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Hidden inputs for transaction data -->
-        <input type="hidden" id="user_id" value="{{ auth()->id() }}">
-        <input type="hidden" id="coin_id" name="coin_id">
-        <input type="hidden" id="vendor_id" name="vendor_id">
-        
-        <!-- Form: Step 1 -->
-        <div id="step1">
-          <form id="buyCryptoForm">
+        <!-- Main Form that will be submitted -->
+        <form id="cryptTransactionForm" method="POST" action="{{ route('user.crypto.buy') }}">
+          @csrf
+          <input type="hidden" id="user_id" name="user_id" value="{{ auth()->id() }}">
+          <input type="hidden" id="coin_id" name="coin_id">
+          <input type="hidden" id="vendor_id" name="vendor_id">
+          <input type="hidden" id="amount" name="amount">
+          
+          <!-- Form: Step 1 -->
+          <div id="step1">
             <div class="mb-3">
-              <label for="coin" class="form-label">Select Coin</label>
-              <select class="form-select" id="coin" name="coin" required>
+              <label for="coin_select" class="form-label">Select Coin</label>
+              <select class="form-select" id="coin_select" required>
                 <option value="" disabled selected>Select a coin</option>
                 <!-- Options populated dynamically -->
               </select>
             </div>
             <div class="mb-3">
-              <label for="amount" class="form-label">Amount</label>
-              <input type="number" class="form-control" id="amount" name="amount" placeholder="Enter amount" required>
+              <label for="amount_input" class="form-label">Amount</label>
+              <input type="number" class="form-control" id="amount_input" placeholder="Enter amount" required>
             </div>
             <div class="mb-3">
-              <label for="vendor" class="form-label">Select Vendor</label>
-              <select class="form-select" id="vendor" name="vendor" required>
+              <label for="vendor_select" class="form-label">Select Vendor</label>
+              <select class="form-select" id="vendor_select" required>
                 <option value="" disabled selected>Select a vendor</option>
                 <!-- Options populated dynamically -->
               </select>
             </div>
             <button type="button" id="proceedBtn" class="btn btn-primary">Proceed</button>
-          </form>
-        </div>
-        <!-- Form: Step 2 -->
-        <div id="step2" style="display: none;">
-          <h6>Transaction Summary</h6>
-          <ul class="list-group">
-            <li class="list-group-item"><strong>Coin:</strong> <span id="summaryCoin"></span></li>
-            <li class="list-group-item"><strong>Amount:</strong> <span id="summaryAmount"></span></li>
-            <li class="list-group-item"><strong>Vendor:</strong> <span id="summaryVendor"></span></li>
-            <li class="list-group-item">
-              <strong>Wallet Address:</strong>
-              <span id="summaryWallet"></span>
-              <button class="btn btn-sm btn-outline-secondary" id="copyWalletBtn">Copy</button>
-            </li>
-          </ul>
-          <button type="button" id="continueBtn" class="btn btn-success mt-3">Continue</button>
-        </div>
+          </div>
+          
+          <!-- Form: Step 2 -->
+          <div id="step2" style="display: none;">
+            <h6>Transaction Summary</h6>
+            <ul class="list-group">
+              <li class="list-group-item"><strong>Coin:</strong> <span id="summaryCoin"></span></li>
+              <li class="list-group-item"><strong>Amount:</strong> <span id="summaryAmount"></span></li>
+              <li class="list-group-item"><strong>Vendor:</strong> <span id="summaryVendor"></span></li>
+              <li class="list-group-item">
+                <strong>Wallet Address:</strong>
+                <span id="summaryWallet"></span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="copyWalletBtn">Copy</button>
+              </li>
+            </ul>
+            <button type="button" id="continueBtn" class="btn btn-success mt-3">Continue</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
+
+
+<!-- Swap Crypto Modal -->
+<div class="modal fade" id="swapCryptoModal" tabindex="-1" aria-labelledby="swapCryptoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="swapCryptoModalLabel">Swap Cryptocurrency</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ route('user.crypto.swap') }}" method="POST">
+          @csrf
+          <div class="mb-3">
+            <label for="fromCoin" class="form-label">From Coin</label>
+            <select class="form-select" id="fromCoin" name="from_coin" required>
+              @foreach($cryptoBalances as $crypto => $balance)
+                @if($balance > 0)
+                      <option value="{{ $crypto }}" data-balance="{{ $balance }}">
+                        {{ strtoupper($crypto) }} - Balance: {{ $balance }}
+                      </option>
+                @endif
+              @endforeach
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="swapAmount" class="form-label">Amount to Swap</label>
+            <input type="number" class="form-control" id="swapAmount" name="amount" step="0.0001" required>
+            <small id="maxAmount" class="text-muted"></small>
+          </div>
+
+          <div class="mb-3">
+            <label for="toCoin" class="form-label">To Coin</label>
+            <select class="form-select" id="toCoin" name="to_coin" required>
+              @foreach($coins as $coin)
+                <option value="{{ strtolower($coin->symbol) }}">{{ $coin->name }}</option>
+              @endforeach
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <p>Estimated Receive Amount: <span id="estimatedAmount">0.00</span></p>
+            <p>Exchange Rate: <span id="exchangeRate">-</span></p>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Swap</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 @push('style')
     <style>
         .copied::after {
@@ -303,35 +359,25 @@
 @endpush
 
 @push('script')
-        <script>
-            (function($) {
-                "use strict";
-                $('#copyBoard').click(function() {
-                    var copyText = $('.referralURL').get(0);
-                    navigator.clipboard.writeText(copyText.value).then(() => {
-                        this.classList.add('copied');
-                        setTimeout(() => this.classList.remove('copied'), 1500);
-                    });
-                });
-            })(jQuery);
-        </script>
-       <script>
-        const coins = @json($coins);
+                        <script>
+                            (function($) {
+                                "use strict";
+                                $('#copyBoard').click(function() {
+                                    var copyText = $('.referralURL').get(0);
+                                    navigator.clipboard.writeText(copyText.value).then(() => {
+                                        this.classList.add('copied');
+                                        setTimeout(() => this.classList.remove('copied'), 1500);
+                                    });
+                                });
+                            })(jQuery);
+                        </script>
+                       <script>
+                       const coins = @json($coins);
         const vendors = @json($vendors);
-
-        // Handle coin selection
-        $("#coin").on("change", function () {
-            $("#coin_id").val($(this).val());
-        });
-
-        // Handle vendor selection
-        $("#vendor").on("change", function () {
-            $("#vendor_id").val($(this).val());
-        });
 
         document.addEventListener("DOMContentLoaded", function () {
             // Populate Coins Dropdown
-            const coinDropdown = $("#coin");
+            const coinDropdown = $("#coin_select");
             coinDropdown
                 .empty()
                 .append('<option value="" disabled selected>Select a coin</option>');
@@ -342,7 +388,7 @@
             });
 
             // Populate Vendors Dropdown
-            const vendorDropdown = $("#vendor");
+            const vendorDropdown = $("#vendor_select");
             vendorDropdown
                 .empty()
                 .append('<option value="" disabled selected>Select a vendor</option>');
@@ -352,20 +398,35 @@
                 );
             });
 
+            // Handle coin selection
+            $("#coin_select").on("change", function () {
+                $("#coin_id").val($(this).val());
+            });
+
+            // Handle vendor selection
+            $("#vendor_select").on("change", function () {
+                $("#vendor_id").val($(this).val());
+            });
+
             // Handle Proceed Button
             $("#proceedBtn").on("click", function () {
-                const selectedCoin = $("#coin option:selected");
-                const amount = $("#amount").val();
-                const selectedVendor = $("#vendor option:selected");
+                const selectedCoin = $("#coin_select option:selected");
+                const amountInput = $("#amount_input").val();
+                const selectedVendor = $("#vendor_select option:selected");
 
-                if (!selectedCoin.val() || !amount || !selectedVendor.val()) {
+                if (!selectedCoin.val() || !amountInput || !selectedVendor.val()) {
                     alert("Please fill all fields.");
                     return;
                 }
 
+                // Update hidden form fields
+                $("#coin_id").val(selectedCoin.val());
+                $("#vendor_id").val(selectedVendor.val());
+                $("#amount").val(amountInput);
+
                 // Populate Summary
                 $("#summaryCoin").text(selectedCoin.text());
-                $("#summaryAmount").text(amount);
+                $("#summaryAmount").text(amountInput);
                 $("#summaryVendor").text(selectedVendor.text());
                 $("#summaryWallet").text(selectedCoin.data("wallet"));
 
@@ -383,54 +444,55 @@
             });
 
             // Continue Button
-            $("#continueBtn").on("click", function () {
+            $("#continueBtn").on("click", function (e) {
                 if ($(this).text() === "Continue") {
                     // Only open new window in Continue state
-                    const vendorUrl = $("#vendor option:selected").data("url");
+                    const vendorUrl = $("#vendor_select option:selected").data("url");
                     window.open(vendorUrl, "_blank");
 
                     // Change button to Confirm Payment state
                     $(this).text("Confirm Payment").addClass("btn-warning");
                 } else {
-                    // Handle Confirm Payment click
-                    confirmPayment();
+                    // Submit the form
+                    $("#cryptTransactionForm").submit();
                 }
             });
-
-            // Confirm Payment
-            function confirmPayment() {
-                // Get the necessary data from your form or page
-                const transactionData = {
-                    user_id: $("#user_id").val(),
-                    coin_id: $("#coin_id").val(),
-                    vendor_id: $("#vendor").val(),
-                    amount: $("#amount").val()
-                };
-
-                // Make AJAX call to store the transaction
-                $.ajax({
-                    url: '/payment/crypt-transactions', // Updated URL to match your route prefix
-                    method: 'POST',
-                    data: transactionData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (response) {
-                        alert("Payment confirmed! Admin has been notified.");
-                        $("#buyCryptoModal").modal("hide");
-                        window.location.reload();
-                    },
-                    error: function (xhr, status, error) {
-                        let errorMessage = "Error confirming payment";
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        }
-                        alert(errorMessage);
-                    }
-                });
-            }
         });
+                    </script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const fromCoinSelect = document.getElementById('fromCoin');
+        const amountInput = document.getElementById('swapAmount');
+        const toCoinSelect = document.getElementById('toCoin');
+        const maxAmountText = document.getElementById('maxAmount');
+        const estimatedAmountText = document.getElementById('estimatedAmount');
+        const exchangeRateText = document.getElementById('exchangeRate');
+
+        const updateEstimate = () => {
+          const fromCoin = fromCoinSelect.value;
+          const toCoin = toCoinSelect.value;
+          const amount = amountInput.value;
+
+          if (fromCoin && toCoin && amount) {
+            fetch(`https://api.coinconvert.net/convert/${fromCoin}/${toCoin}?amount=${amount}`)
+              .then(response => response.json())
+              .then(data => {
+                const estimatedAmount = data[toCoin.toUpperCase()];
+                estimatedAmountText.textContent = estimatedAmount.toFixed(8);
+                exchangeRateText.textContent = `1 ${fromCoin.toUpperCase()} = ${(estimatedAmount / amount).toFixed(8)} ${toCoin.toUpperCase()}`;
+              });
+          }
+        };
+
+        fromCoinSelect.addEventListener('change', function () {
+          const balance = this.options[this.selectedIndex].dataset.balance;
+          maxAmountText.textContent = `Available: ${balance}`;
+          updateEstimate();
+        });
+
+        amountInput.addEventListener('input', updateEstimate);
+        toCoinSelect.addEventListener('change', updateEstimate);
+      });
     </script>
-
-
 @endpush

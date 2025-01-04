@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CryptoTransactionController;
 
-Route::get('/clear', function(){
+Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
 
@@ -19,12 +20,19 @@ Route::controller('TicketController')->prefix('ticket')->name('ticket.')->group(
     Route::get('download/{ticket}', 'ticketDownload')->name('download');
 });
 
+Route::prefix('user')->name('user.')->middleware('auth')->group(function () {
+    Route::controller(CryptoTransactionController::class)->name('crypto.')->prefix('crypto')->group(function () {
+        Route::post('buy', 'cryptoBought')->name('buy');
+        Route::post('swap', 'swapCrypto')->name('swap');
+    });
+});
+
 Route::controller('SiteController')->group(function () {
 
     Route::get('/contact', 'contact')->name('contact');
-    
+
     Route::post('/contact', 'contactSubmit');
-    
+
     Route::get('/change/{lang?}', 'changeLanguage')->name('lang');
 
     Route::get('cookie-policy', 'cookiePolicy')->name('cookie.policy');
@@ -44,7 +52,7 @@ Route::controller('SiteController')->group(function () {
     Route::get('placeholder-image/{size}', 'placeholderImage')->name('placeholder.image');
 
     Route::get('/{slug}', 'pages')->name('pages');
-    
+
     Route::get('/', 'index')->name('home');
 });
 

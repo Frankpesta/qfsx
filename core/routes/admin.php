@@ -3,29 +3,30 @@
 use Illuminate\Support\Facades\Route;
 
 
-Route::namespace('Auth')->group(function () {
-    Route::controller('LoginController')->group(function () {
-        Route::get('/', 'showLoginForm')->name('login');
-        Route::post('/', 'login')->name('login');
-        Route::get('logout', 'logout')->name('logout');
-    });
+Route::
+        namespace('Auth')->group(function () {
+            Route::controller('LoginController')->group(function () {
+                Route::get('/', 'showLoginForm')->name('login');
+                Route::post('/', 'login')->name('login');
+                Route::get('logout', 'logout')->name('logout');
+            });
 
-    // Admin Password Reset
-    Route::controller('ForgotPasswordController')->prefix('password')->name('password.')->group(function(){
-        Route::get('reset', 'showLinkRequestForm')->name('reset');
-        Route::post('reset', 'sendResetCodeEmail');
-        Route::get('code-verify', 'codeVerify')->name('code.verify');
-        Route::post('verify-code', 'verifyCode')->name('verify.code');
-    });
+            // Admin Password Reset
+            Route::controller('ForgotPasswordController')->prefix('password')->name('password.')->group(function () {
+                Route::get('reset', 'showLinkRequestForm')->name('reset');
+                Route::post('reset', 'sendResetCodeEmail');
+                Route::get('code-verify', 'codeVerify')->name('code.verify');
+                Route::post('verify-code', 'verifyCode')->name('verify.code');
+            });
 
-    Route::controller('ResetPasswordController')->group(function(){
-        Route::get('password/reset/{token}', 'showResetForm')->name('password.reset.form');
-        Route::post('password/reset/change', 'reset')->name('password.change');
-    });
-});
+            Route::controller('ResetPasswordController')->group(function () {
+                Route::get('password/reset/{token}', 'showResetForm')->name('password.reset.form');
+                Route::post('password/reset/change', 'reset')->name('password.change');
+            });
+        });
 
 Route::middleware('admin')->group(function () {
-    Route::controller('AdminController')->group(function(){
+    Route::controller('AdminController')->group(function () {
         Route::get('dashboard', 'dashboard')->name('dashboard');
         Route::get('profile', 'profile')->name('profile');
         Route::post('profile', 'profileUpdate')->name('profile.update');
@@ -33,20 +34,20 @@ Route::middleware('admin')->group(function () {
         Route::post('password', 'passwordUpdate')->name('password.update');
 
         //Notification
-        Route::get('notifications','notifications')->name('notifications');
-        Route::get('notification/read/{id}','notificationRead')->name('notification.read');
-        Route::get('notifications/read-all','readAll')->name('notifications.readAll');
+        Route::get('notifications', 'notifications')->name('notifications');
+        Route::get('notification/read/{id}', 'notificationRead')->name('notification.read');
+        Route::get('notifications/read-all', 'readAll')->name('notifications.readAll');
 
         //Report Bugs
-        Route::get('request-report','requestReport')->name('request.report');
-        Route::post('request-report','reportSubmit');
+        Route::get('request-report', 'requestReport')->name('request.report');
+        Route::post('request-report', 'reportSubmit');
 
         Route::get('download-attachments/{file_hash}', 'downloadAttachment')->name('download.attachment');
     });
 
 
     // Currency
-    Route::controller('CurrencyController')->name('currency.')->prefix('currency')->group(function(){
+    Route::controller('CurrencyController')->name('currency.')->prefix('currency')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('create', 'create')->name('create');
         Route::post('save/{id?}', 'save')->name('save');
@@ -55,14 +56,14 @@ Route::middleware('admin')->group(function () {
     });
 
     // Plan
-    Route::controller('PlanController')->prefix('plan')->name('plan.')->group(function(){
+    Route::controller('PlanController')->prefix('plan')->name('plan.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('save/{id?}', 'save')->name('save');
         Route::post('status/{id}', 'status')->name('status');
     });
 
     // Users Manager
-    Route::controller('ManageUsersController')->name('users.')->prefix('users')->group(function(){
+    Route::controller('ManageUsersController')->name('users.')->prefix('users')->group(function () {
         Route::get('/', 'allUsers')->name('all');
         Route::get('active', 'activeUsers')->name('active');
         Route::get('banned', 'bannedUsers')->name('banned');
@@ -97,20 +98,20 @@ Route::middleware('admin')->group(function () {
 
     });
 
-    Route::controller('ManageUsersController')->name('eligible.')->prefix('eligible')->group(function(){
+    Route::controller('ManageUsersController')->name('eligible.')->prefix('eligible')->group(function () {
         Route::get('/', 'makeEligible')->name('index');
         Route::post('/store', 'makeEligibleStore')->name('store');
     });
 
     //refer
-    Route::controller('ReferralController')->name('referrals.')->prefix('referrals')->group(function(){
+    Route::controller('ReferralController')->name('referrals.')->prefix('referrals')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'update')->name('update');
         Route::get('status', 'status')->name('status');
     });
 
     //  InvestmentController
-    Route::controller('InvestmentController')->name('investment.')->prefix('investment')->group(function(){
+    Route::controller('InvestmentController')->name('investment.')->prefix('investment')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/pending', 'pending')->name('pending');
         Route::get('/upcoming', 'upcoming')->name('upcoming');
@@ -119,7 +120,7 @@ Route::middleware('admin')->group(function () {
         Route::get('/detail/{id}', 'detail')->name('detail');
     });
 
-    Route::controller('WithdrawalController')->name('withdraw.')->prefix('withdrawal')->group(function(){
+    Route::controller('WithdrawalController')->name('withdraw.')->prefix('withdrawal')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/pending', 'pending')->name('pending');
         Route::get('/completed', 'completed')->name('completed');
@@ -127,21 +128,21 @@ Route::middleware('admin')->group(function () {
         Route::get('/referral', 'referral')->name('referral');
     });
 
-    Route::controller('PaymentController')->name('payment.')->prefix('payment')->group(function(){
+    Route::controller('PaymentController')->name('payment.')->prefix('payment')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/waiting', 'waiting')->name('waiting');
         Route::get('/complete', 'complete')->name('complete');
         Route::get('/reported', 'reported')->name('reported');
         Route::get('/rejected', 'rejected')->name('rejected');
         Route::get('/detail/{id}', 'detail')->name('detail');
-        
+
         Route::get('image/download/{id}', 'download')->name('image.download');
         Route::post('send/message/{id}', 'sendMessage')->name('send.message');
         Route::post('take/action/{id}', 'takeAction')->name('action');
     });
 
     // Subscriber
-    Route::controller('SubscriberController')->prefix('subscriber')->name('subscriber.')->group(function(){
+    Route::controller('SubscriberController')->prefix('subscriber')->name('subscriber.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('send-email', 'sendEmailForm')->name('send.email');
         Route::post('remove/{id}', 'remove')->name('remove');
@@ -149,7 +150,7 @@ Route::middleware('admin')->group(function () {
     });
 
     // Report
-    Route::controller('ReportController')->prefix('report')->name('report.')->group(function(){
+    Route::controller('ReportController')->prefix('report')->name('report.')->group(function () {
         Route::get('transaction', 'transaction')->name('transaction');
         Route::get('login/history', 'loginHistory')->name('login.history');
         Route::get('login/ipHistory/{ip}', 'loginIpHistory')->name('login.ipHistory');
@@ -159,7 +160,7 @@ Route::middleware('admin')->group(function () {
     });
 
     // Admin Support
-    Route::controller('SupportTicketController')->prefix('ticket')->name('ticket.')->group(function(){
+    Route::controller('SupportTicketController')->prefix('ticket')->name('ticket.')->group(function () {
         Route::get('/', 'tickets')->name('index');
         Route::get('pending', 'pendingTicket')->name('pending');
         Route::get('closed', 'closedTicket')->name('closed');
@@ -173,7 +174,7 @@ Route::middleware('admin')->group(function () {
 
 
     // Language Manager
-    Route::controller('LanguageController')->prefix('language')->name('language.')->group(function(){
+    Route::controller('LanguageController')->prefix('language')->name('language.')->group(function () {
         Route::get('/', 'langManage')->name('manage');
         Route::post('/', 'langStore')->name('manage.store');
         Route::post('delete/{id}', 'langDelete')->name('manage.delete');
@@ -185,62 +186,62 @@ Route::middleware('admin')->group(function () {
         Route::post('update/key/{id}', 'updateLanguageJson')->name('update.key');
     });
 
-    Route::controller('GeneralSettingController')->group(function(){
+    Route::controller('GeneralSettingController')->group(function () {
         // General Setting
         Route::get('general-setting', 'index')->name('setting.index');
         Route::post('general-setting', 'update')->name('setting.update');
 
         //configuration
-        Route::get('setting/system-configuration','systemConfiguration')->name('setting.system.configuration');
-        Route::post('setting/system-configuration','systemConfigurationSubmit');
+        Route::get('setting/system-configuration', 'systemConfiguration')->name('setting.system.configuration');
+        Route::post('setting/system-configuration', 'systemConfigurationSubmit');
 
         // Logo-Icon
         Route::get('setting/logo-icon', 'logoIcon')->name('setting.logo.icon');
         Route::post('setting/logo-icon', 'logoIconUpdate')->name('setting.logo.icon');
 
         //Custom CSS
-        Route::get('custom-css','customCss')->name('setting.custom.css');
-        Route::post('custom-css','customCssSubmit');
+        Route::get('custom-css', 'customCss')->name('setting.custom.css');
+        Route::post('custom-css', 'customCssSubmit');
 
         //Cookie
-        Route::get('cookie','cookie')->name('setting.cookie');
-        Route::post('cookie','cookieSubmit');
+        Route::get('cookie', 'cookie')->name('setting.cookie');
+        Route::post('cookie', 'cookieSubmit');
 
         //maintenance_mode
-        Route::get('maintenance-mode','maintenanceMode')->name('maintenance.mode');
-        Route::post('maintenance-mode','maintenanceModeSubmit');
+        Route::get('maintenance-mode', 'maintenanceMode')->name('maintenance.mode');
+        Route::post('maintenance-mode', 'maintenanceModeSubmit');
 
     });
 
 
     //KYC setting
-    Route::controller('KycController')->group(function(){
-        Route::get('kyc-setting','setting')->name('kyc.setting');
-        Route::post('kyc-setting','settingUpdate');
+    Route::controller('KycController')->group(function () {
+        Route::get('kyc-setting', 'setting')->name('kyc.setting');
+        Route::post('kyc-setting', 'settingUpdate');
     });
 
     //Notification Setting
-    Route::name('setting.notification.')->controller('NotificationController')->prefix('notification')->group(function(){
+    Route::name('setting.notification.')->controller('NotificationController')->prefix('notification')->group(function () {
         //Template Setting
-        Route::get('global','global')->name('global');
-        Route::post('global/update','globalUpdate')->name('global.update');
-        Route::get('templates','templates')->name('templates');
-        Route::get('template/edit/{id}','templateEdit')->name('template.edit');
-        Route::post('template/update/{id}','templateUpdate')->name('template.update');
+        Route::get('global', 'global')->name('global');
+        Route::post('global/update', 'globalUpdate')->name('global.update');
+        Route::get('templates', 'templates')->name('templates');
+        Route::get('template/edit/{id}', 'templateEdit')->name('template.edit');
+        Route::post('template/update/{id}', 'templateUpdate')->name('template.update');
 
         //Email Setting
-        Route::get('email/setting','emailSetting')->name('email');
-        Route::post('email/setting','emailSettingUpdate');
-        Route::post('email/test','emailTest')->name('email.test');
+        Route::get('email/setting', 'emailSetting')->name('email');
+        Route::post('email/setting', 'emailSettingUpdate');
+        Route::post('email/test', 'emailTest')->name('email.test');
 
         //SMS Setting
-        Route::get('sms/setting','smsSetting')->name('sms');
-        Route::post('sms/setting','smsSettingUpdate');
-        Route::post('sms/test','smsTest')->name('sms.test');
+        Route::get('sms/setting', 'smsSetting')->name('sms');
+        Route::post('sms/setting', 'smsSettingUpdate');
+        Route::post('sms/test', 'smsTest')->name('sms.test');
     });
 
     // Plugin
-    Route::controller('ExtensionController')->prefix('extensions')->name('extensions.')->group(function(){
+    Route::controller('ExtensionController')->prefix('extensions')->name('extensions.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('update/{id}', 'update')->name('update');
         Route::post('status/{id}', 'status')->name('status');
@@ -248,9 +249,9 @@ Route::middleware('admin')->group(function () {
 
 
     //System Information
-    Route::controller('SystemController')->name('system.')->prefix('system')->group(function(){
-        Route::get('info','systemInfo')->name('info');
-        Route::get('server-info','systemServerInfo')->name('server.info');
+    Route::controller('SystemController')->name('system.')->prefix('system')->group(function () {
+        Route::get('info', 'systemInfo')->name('info');
+        Route::get('server-info', 'systemServerInfo')->name('server.info');
         Route::get('optimize', 'optimize')->name('optimize');
         Route::get('optimize-clear', 'optimizeClear')->name('optimize.clear');
     });
@@ -263,7 +264,7 @@ Route::middleware('admin')->group(function () {
     // Frontend
     Route::name('frontend.')->prefix('frontend')->group(function () {
 
-        Route::controller('FrontendController')->group(function(){
+        Route::controller('FrontendController')->group(function () {
             Route::get('templates', 'templates')->name('templates');
             Route::post('templates', 'templatesActive')->name('templates.active');
             Route::get('frontend-sections/{key}', 'frontendSections')->name('sections');
@@ -273,7 +274,7 @@ Route::middleware('admin')->group(function () {
         });
 
         // Page Builder
-        Route::controller('PageBuilderController')->group(function(){
+        Route::controller('PageBuilderController')->group(function () {
             Route::get('manage-pages', 'managePages')->name('manage.pages');
             Route::post('manage-pages', 'managePagesSave')->name('manage.pages.save');
             Route::post('manage-pages/update', 'managePagesUpdate')->name('manage.pages.update');

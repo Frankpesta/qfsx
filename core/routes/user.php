@@ -109,7 +109,6 @@ Route::middleware('auth')->name('user.')->group(function () {
                 Route::post('confirm/{id}', 'paymentConfirm')->name('confirm');
                 Route::post('not/paid/{id}', 'paymentNotPaid')->name('not.paid');
                 Route::get('information/download/{id}', 'informationDownload')->name('information.download');
-                Route::post('crypt-transactions', 'cryptoBought')->name('bought');
             });
         });
     });

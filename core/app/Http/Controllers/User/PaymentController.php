@@ -12,10 +12,11 @@ use App\Models\Payment;
 use App\Models\RecommitLog;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Models\CryptTransaction;
 use App\Models\WithdrawalInfo;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
+
+
 
 class PaymentController extends Controller
 {
@@ -83,40 +84,6 @@ class PaymentController extends Controller
         ]);
 
         return back()->withNotify($notify);
-    }
-
-    public function cryptoBought(Request $request)
-    {
-        $validatedData = $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
-            'coin_id' => 'required|integer|exists:coins,id',
-            'vendor_id' => 'required|integer|exists:vendors,id',
-            'amount' => 'required|numeric|min:0.01',
-        ]);
-
-        // Create transaction
-        $transaction = CryptTransaction::create([
-            'user_id' => $validatedData['user_id'],
-            'coin_id' => $validatedData['coin_id'],
-            'vendor_id' => $validatedData['vendor_id'],
-            'amount' => $validatedData['amount'],
-            'status' => 'completed',
-        ]);
-
-        // Notify admin via email
-        \Mail::raw(
-            "A new crypto purchase has been completed:\n\n" .
-            "Coin: {$transaction->coin->name} ({$transaction->coin->symbol})\n" .
-            "Amount: {$transaction->amount}\n" .
-            "Vendor: {$transaction->vendor->name}\n" .
-            "User ID: {$transaction->user_id}",
-            function ($message) {
-                $message->to('admin@example.com') // Replace with admin email
-                    ->subject('New Crypto Purchase');
-            }
-        );
-
-        return response()->json(['message' => 'Payment confirmed and admin notified.'], 200);
     }
 
     public function paymentConfirm($id)
