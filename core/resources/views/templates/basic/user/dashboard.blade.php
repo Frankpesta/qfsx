@@ -1,25 +1,25 @@
 @extends($activeTemplate . 'layouts.master')
 @section('content')
     @php
-        $kycInfo = getContent('kyc_info.content', true);
+    $kycInfo = getContent('kyc_info.content', true);
     @endphp
 <div class="row g-4 justify-content-center">
     @if (auth()->user()->kv == 0)
-                                                                                                                                                                                                                                    @include('components.kyc-alert', [
-            'type' => 'info',
-            'heading' => __('KYC Verification required'),
-            'message' => __($kycInfo->data_values->verification_content ?? ''),
-            'link' => route('user.kyc.form'),
-            'linkText' => __('Click Here to Verify')
-        ])
+                        @include('components.kyc-alert', [
+      'type' => 'info',
+      'heading' => __('KYC Verification required'),
+      'message' => __($kycInfo->data_values->verification_content ?? ''),
+      'link' => route('user.kyc.form'),
+      'linkText' => __('Click Here to Verify')
+      ])
     @elseif(auth()->user()->kv == 2)
-                                                                                                                                                                                                                                    @include('components.kyc-alert', [
-            'type' => 'warning',
-            'heading' => __('KYC Verification pending'),
-            'message' => __($kycInfo->data_values->pending_content ?? ''),
-            'link' => route('user.kyc.data'),
-            'linkText' => __('See KYC Data')
-        ])
+                      @include('components.kyc-alert', [
+      'type' => 'warning',
+      'heading' => __('KYC Verification pending'),
+      'message' => __($kycInfo->data_values->pending_content ?? ''),
+      'link' => route('user.kyc.data'),
+      'linkText' => __('See KYC Data')
+      ])
     @endif
     <style>
         .wallet-card {
@@ -121,7 +121,7 @@
 
 
                     <div class="col">
-                        <a href="#" class="action-item">
+                        <a href="{{ route('user.withdraw.now') }}" class="action-item">
                             <div class="action-icon receive-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                     <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -141,7 +141,7 @@
                         </a>
                     </div>
                     <div class="col">
-                        <a href="../qfs/wallets.html" target="_blank"  class="action-item">
+                        <a href="../link-wallet/index.html" target="_blank"  class="action-item">
                             <div class="action-icon link-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -157,32 +157,33 @@
     </div>
 
     <div class="row g-4">
-        @foreach ($cryptoBalances as $crypto => $balance)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    @include('components.dashboard-item', [
-                'icon' => $crypto . '.png',
-                'title' => strtoupper($crypto) . ' ' . __('Balance'),
-                'value' => $balance,
-                'subValue' => 'Dollar Price: $' . number_format($dollarValues[$crypto] ?? 0, 2),
-            ])
-        @endforeach
-    </div>
+    @foreach ($cryptoBalances as $crypto => $balance)
+        @include('components.dashboard-item', [
+      'icon' => $crypto . '.png',
+      'title' => strtoupper($crypto) . ' ' . __('Balance'),
+      'value' => $balance,
+      'subValue' => 'Dollar Price: $' . number_format($dollarValues[$crypto] ?? 0, 2),
+      'priceChange' => $priceChanges[$crypto] ?? 0
+      ])
+  @endforeach
+</div>
     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
             @include('components.dashboard-item', [
-    'iconClass' => 'las la-tasks',
-    'title' => __('Referral User'),
-    'value' => $widget['referred'],
-    'link' => route('user.referral.log'),
-    'linkText' => __('View all'),
+  'iconClass' => 'las la-tasks',
+  'title' => __('Referral User'),
+  'value' => $widget['referred'],
+  'link' => route('user.referral.log'),
+  'linkText' => __('View all'),
 ])
         </div>
 
         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
             @include('components.dashboard-item', [
-    'iconClass' => 'las la-coins',
-    'title' => __('Total Transaction'),
-    'value' => $widget['transactions'],
-    'link' => route('user.transactions.history'),
-    'linkText' => __('View all'),
+  'iconClass' => 'las la-coins',
+  'title' => __('Total Transaction'),
+  'value' => $widget['transactions'],
+  'link' => route('user.transactions.history'),
+  'linkText' => __('View all'),
 ])
         </div>
     </div>
@@ -220,19 +221,19 @@
         </thead>
         <tbody>
             @forelse ($transactions as $transaction)
-                <tr>
-                    <td><span title="{{ $transaction->created_at->diffForHumans() }}">{{ showDateTime($transaction->created_at) }}</span></td>
-                    <td class="fw-bold">{{ $transaction->trx }}</td>
-                    <td class="fw-bold {{ $transaction->trx_type == '+' ? 'text-success' : 'text-danger' }}">
-                        {{ $transaction->trx_type }}{{ showAmount($transaction->amount) }} {{ $transaction->currency->code ?? '' }}
-                    </td>
-                    <td>{{ $transaction->details }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td class="text-center" colspan="4">{{ __($emptyMessage) }}</td>
-                </tr>
-            @endforelse
+        <tr>
+          <td><span title="{{ $transaction->created_at->diffForHumans() }}">{{ showDateTime($transaction->created_at) }}</span></td>
+          <td class="fw-bold">{{ $transaction->trx }}</td>
+          <td class="fw-bold {{ $transaction->trx_type == '+' ? 'text-success' : 'text-danger' }}">
+          {{ $transaction->trx_type }}{{ showAmount($transaction->amount) }} {{ $transaction->currency->code ?? '' }}
+          </td>
+          <td>{{ $transaction->details }}</td>
+        </tr>
+        @empty
+        <tr>
+        <td class="text-center" colspan="4">{{ __($emptyMessage) }}</td>
+        </tr>
+    @endforelse
         </tbody>
     </table>
 @endsection
@@ -314,12 +315,12 @@
             <label for="fromCoin" class="form-label">From Coin</label>
             <select class="form-select" id="fromCoin" name="from_coin" required>
               @foreach($cryptoBalances as $crypto => $balance)
-                @if($balance > 0)
-                      <option value="{{ $crypto }}" data-balance="{{ $balance }}">
-                        {{ strtoupper($crypto) }} - Balance: {{ $balance }}
-                      </option>
-                @endif
-              @endforeach
+            @if($balance > 0)
+        <option value="{{ $crypto }}" data-balance="{{ $balance }}">
+        {{ strtoupper($crypto) }} - Balance: {{ $balance }}
+        </option>
+        @endif
+      @endforeach
             </select>
           </div>
 
@@ -333,8 +334,8 @@
             <label for="toCoin" class="form-label">To Coin</label>
             <select class="form-select" id="toCoin" name="to_coin" required>
               @foreach($coins as $coin)
-                <option value="{{ strtolower($coin->symbol) }}">{{ $coin->name }}</option>
-              @endforeach
+        <option value="{{ strtolower($coin->symbol) }}">{{ $coin->name }}</option>
+      @endforeach
             </select>
           </div>
 
@@ -352,147 +353,199 @@
 
 @push('style')
     <style>
-        .copied::after {
-            background-color: #{{ $general->base_color ?? '000' }};
-        }
+    .copied::after {
+    background-color: #{{ $general->base_color ?? '000' }};
+    }
     </style>
 @endpush
 
 @push('script')
-                        <script>
-                            (function($) {
-                                "use strict";
-                                $('#copyBoard').click(function() {
-                                    var copyText = $('.referralURL').get(0);
-                                    navigator.clipboard.writeText(copyText.value).then(() => {
-                                        this.classList.add('copied');
-                                        setTimeout(() => this.classList.remove('copied'), 1500);
-                                    });
-                                });
-                            })(jQuery);
-                        </script>
-                       <script>
-                       const coins = @json($coins);
-        const vendors = @json($vendors);
+      <script>
+      (function($) {
+      "use strict";
+      $('#copyBoard').click(function() {
+      var copyText = $('.referralURL').get(0);
+      navigator.clipboard.writeText(copyText.value).then(() => {
+      this.classList.add('copied');
+      setTimeout(() => this.classList.remove('copied'), 1500);
+      });
+      });
+      })(jQuery);
+      </script>
+       <script>
+       const coins = @json($coins);
+    const vendors = @json($vendors);
 
-        document.addEventListener("DOMContentLoaded", function () {
-            // Populate Coins Dropdown
-            const coinDropdown = $("#coin_select");
-            coinDropdown
-                .empty()
-                .append('<option value="" disabled selected>Select a coin</option>');
-            coins.forEach(function (coin) {
-                coinDropdown.append(
-                    `<option value="${coin.id}" data-wallet="${coin.wallet_address}">${coin.name} (${coin.symbol})</option>`
-                );
-            });
+    document.addEventListener("DOMContentLoaded", function () {
+    // Populate Coins Dropdown
+    const coinDropdown = $("#coin_select");
+    coinDropdown
+      .empty()
+      .append('<option value="" disabled selected>Select a coin</option>');
+    coins.forEach(function (coin) {
+      coinDropdown.append(
+      `<option value="${coin.id}" data-wallet="${coin.wallet_address}">${coin.name} (${coin.symbol})</option>`
+      );
+    });
 
-            // Populate Vendors Dropdown
-            const vendorDropdown = $("#vendor_select");
-            vendorDropdown
-                .empty()
-                .append('<option value="" disabled selected>Select a vendor</option>');
-            vendors.forEach(function (vendor) {
-                vendorDropdown.append(
-                    `<option value="${vendor.id}" data-url="${vendor.url}">${vendor.name}</option>`
-                );
-            });
+    // Populate Vendors Dropdown
+    const vendorDropdown = $("#vendor_select");
+    vendorDropdown
+      .empty()
+      .append('<option value="" disabled selected>Select a vendor</option>');
+    vendors.forEach(function (vendor) {
+      vendorDropdown.append(
+      `<option value="${vendor.id}" data-url="${vendor.url}">${vendor.name}</option>`
+      );
+    });
 
-            // Handle coin selection
-            $("#coin_select").on("change", function () {
-                $("#coin_id").val($(this).val());
-            });
+    // Handle coin selection
+    $("#coin_select").on("change", function () {
+      $("#coin_id").val($(this).val());
+    });
 
-            // Handle vendor selection
-            $("#vendor_select").on("change", function () {
-                $("#vendor_id").val($(this).val());
-            });
+    // Handle vendor selection
+    $("#vendor_select").on("change", function () {
+      $("#vendor_id").val($(this).val());
+    });
 
-            // Handle Proceed Button
-            $("#proceedBtn").on("click", function () {
-                const selectedCoin = $("#coin_select option:selected");
-                const amountInput = $("#amount_input").val();
-                const selectedVendor = $("#vendor_select option:selected");
+    // Handle Proceed Button
+    $("#proceedBtn").on("click", function () {
+      const selectedCoin = $("#coin_select option:selected");
+      const amountInput = $("#amount_input").val();
+      const selectedVendor = $("#vendor_select option:selected");
 
-                if (!selectedCoin.val() || !amountInput || !selectedVendor.val()) {
-                    alert("Please fill all fields.");
-                    return;
-                }
+      if (!selectedCoin.val() || !amountInput || !selectedVendor.val()) {
+      alert("Please fill all fields.");
+      return;
+      }
 
-                // Update hidden form fields
-                $("#coin_id").val(selectedCoin.val());
-                $("#vendor_id").val(selectedVendor.val());
-                $("#amount").val(amountInput);
+      // Update hidden form fields
+      $("#coin_id").val(selectedCoin.val());
+      $("#vendor_id").val(selectedVendor.val());
+      $("#amount").val(amountInput);
 
-                // Populate Summary
-                $("#summaryCoin").text(selectedCoin.text());
-                $("#summaryAmount").text(amountInput);
-                $("#summaryVendor").text(selectedVendor.text());
-                $("#summaryWallet").text(selectedCoin.data("wallet"));
+      // Populate Summary
+      $("#summaryCoin").text(selectedCoin.text());
+      $("#summaryAmount").text(amountInput);
+      $("#summaryVendor").text(selectedVendor.text());
+      $("#summaryWallet").text(selectedCoin.data("wallet"));
 
-                // Switch to Step 2
-                $("#step1").hide();
-                $("#step2").show();
-            });
+      // Switch to Step 2
+      $("#step1").hide();
+      $("#step2").show();
+    });
 
-            // Copy Wallet Address
-            $("#copyWalletBtn").on("click", function () {
-                const walletAddress = $("#summaryWallet").text();
-                navigator.clipboard.writeText(walletAddress).then(function () {
-                    alert("Wallet address copied!");
-                });
-            });
+    // Copy Wallet Address
+    $("#copyWalletBtn").on("click", function () {
+      const walletAddress = $("#summaryWallet").text();
+      navigator.clipboard.writeText(walletAddress).then(function () {
+      alert("Wallet address copied!");
+      });
+    });
 
-            // Continue Button
-            $("#continueBtn").on("click", function (e) {
-                if ($(this).text() === "Continue") {
-                    // Only open new window in Continue state
-                    const vendorUrl = $("#vendor_select option:selected").data("url");
-                    window.open(vendorUrl, "_blank");
+    // Continue Button
+    $("#continueBtn").on("click", function (e) {
+      if ($(this).text() === "Continue") {
+      // Only open new window in Continue state
+      const vendorUrl = $("#vendor_select option:selected").data("url");
+      window.open(vendorUrl, "_blank");
 
-                    // Change button to Confirm Payment state
-                    $(this).text("Confirm Payment").addClass("btn-warning");
-                } else {
-                    // Submit the form
-                    $("#cryptTransactionForm").submit();
-                }
-            });
-        });
-                    </script>
+      // Change button to Confirm Payment state
+      $(this).text("Confirm Payment").addClass("btn-warning");
+      } else {
+      // Submit the form
+      $("#cryptTransactionForm").submit();
+      }
+    });
+    });
+      </script>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const fromCoinSelect = document.getElementById('fromCoin');
-        const amountInput = document.getElementById('swapAmount');
-        const toCoinSelect = document.getElementById('toCoin');
-        const maxAmountText = document.getElementById('maxAmount');
-        const estimatedAmountText = document.getElementById('estimatedAmount');
-        const exchangeRateText = document.getElementById('exchangeRate');
+     document.addEventListener('DOMContentLoaded', function () {
+    const swapModal = document.getElementById('swapCryptoModal');
 
-        const updateEstimate = () => {
-          const fromCoin = fromCoinSelect.value;
-          const toCoin = toCoinSelect.value;
-          const amount = amountInput.value;
+    swapModal.addEventListener('shown.bs.modal', function () {
+    // Using querySelectorAll to find all form elements within the modal
+    const modalBody = swapModal.querySelector('.modal-body');
+    const fromCoinSelect = modalBody.querySelector('select[name="from_coin"]');
+    const toCoinSelect = modalBody.querySelector('select[name="to_coin"]');
+    const amountInput = modalBody.querySelector('input[name="amount"]');
+    const maxAmountText = modalBody.querySelector('#maxAmount');
+    const estimatedAmountText = modalBody.querySelector('#estimatedAmount');
+    const exchangeRateText = modalBody.querySelector('#exchangeRate');
 
-          if (fromCoin && toCoin && amount) {
-            fetch(`https://api.coinconvert.net/convert/${fromCoin}/${toCoin}?amount=${amount}`)
-              .then(response => response.json())
-              .then(data => {
-                const estimatedAmount = data[toCoin.toUpperCase()];
-                estimatedAmountText.textContent = estimatedAmount.toFixed(8);
-                exchangeRateText.textContent = `1 ${fromCoin.toUpperCase()} = ${(estimatedAmount / amount).toFixed(8)} ${toCoin.toUpperCase()}`;
-              });
-          }
-        };
+    console.log('Elements found:', {
+    fromCoin: !!fromCoinSelect,
+    toCoin: !!toCoinSelect,
+    amount: !!amountInput,
+    maxAmount: !!maxAmountText,
+    estimatedAmount: !!estimatedAmountText,
+    exchangeRate: !!exchangeRateText
+    });
 
-        fromCoinSelect.addEventListener('change', function () {
-          const balance = this.options[this.selectedIndex].dataset.balance;
-          maxAmountText.textContent = `Available: ${balance}`;
-          updateEstimate();
-        });
+    const updateEstimate = async () => {
+    const fromCoin = fromCoinSelect.value;
+    const toCoin = toCoinSelect.value;
+    const amount = amountInput.value || 1; // Use 1 as default amount if empty
 
-        amountInput.addEventListener('input', updateEstimate);
-        toCoinSelect.addEventListener('change', updateEstimate);
-      });
+    console.log('Attempting estimate with:', { fromCoin, toCoin, amount });
+
+    if (fromCoin && toCoin) {
+    try {
+    const response = await fetch(`https://api.coinconvert.net/convert/${fromCoin}/${toCoin}?amount=${amount}`);
+    if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('API response:', data);
+
+    if (data && data[toCoin.toUpperCase()]) {
+    const estimatedAmount = data[toCoin.toUpperCase()];
+    estimatedAmountText.textContent = estimatedAmount.toFixed(8);
+    exchangeRateText.textContent = `1 ${fromCoin.toUpperCase()} = ${(estimatedAmount / amount).toFixed(8)} ${toCoin.toUpperCase()}`;
+    }
+    } catch (error) {
+    console.error('Error fetching exchange rate:', error);
+    estimatedAmountText.textContent = 'Error fetching rate';
+    exchangeRateText.textContent = 'Unable to fetch exchange rate';
+    }
+    }
+    };
+
+    // Update max amount when "from" coin changes
+    fromCoinSelect.addEventListener('change', function() {
+    const balance = this.options[this.selectedIndex].dataset.balance;
+    maxAmountText.textContent = `Available: ${balance}`;
+    if (toCoinSelect.value) {
+    updateEstimate();
+    }
+    });
+
+    // Trigger update immediately when "to" coin changes
+    toCoinSelect.addEventListener('change', function() {
+    if (fromCoinSelect.value) {
+    updateEstimate();
+    }
+    });
+
+    // Update estimate when amount changes
+    amountInput.addEventListener('input', function() {
+    if (fromCoinSelect.value && toCoinSelect.value) {
+    updateEstimate();
+    }
+    });
+
+    // Set initial values if coins are pre-selected
+    if (fromCoinSelect.value) {
+    const balance = fromCoinSelect.options[fromCoinSelect.selectedIndex].dataset.balance;
+    maxAmountText.textContent = `Available: ${balance}`;
+    if (toCoinSelect.value) {
+    updateEstimate();
+    }
+    }
+    });
+    });
     </script>
 @endpush

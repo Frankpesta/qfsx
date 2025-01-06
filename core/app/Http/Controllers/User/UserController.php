@@ -31,7 +31,6 @@ class UserController extends Controller
     public function home()
     {
         $pageTitle = 'Dashboard';
-
         $user = auth()->user();
 
         $widget['xlm_bal'] = $user->xlm_bal ?? 0;
@@ -58,23 +57,52 @@ class UserController extends Controller
             'btc' => $user->btc_bal ?? 0,
         ];
 
+        $coinGeckoIds = [
+            'xlm' => 'stellar',
+            'xrp' => 'ripple',
+            'algo' => 'algorand',
+            'eth' => 'ethereum',
+            'btc' => 'bitcoin'
+        ];
+
         $baseApiEndpoint = 'https://api.coinconvert.net/convert';
 
         $dollarValues = [];
-        foreach ($cryptoBalances as $crypto => $balance) {
-            $apiEndpoint = "{$baseApiEndpoint}/{$crypto}/usd?amount=1";
+        $priceChanges = [];
 
+        foreach ($cryptoBalances as $crypto => $balance) {
             try {
-                $response = Http::timeout(10)->get($apiEndpoint);
+                $currentPriceEndpoint = "{$baseApiEndpoint}/{$crypto}/usd?amount=1";
+                $response = Http::timeout(10)->get($currentPriceEndpoint);
+
+                $geckoId = $coinGeckoIds[$crypto];
+                $historicalEndpoint = "https://api.coingecko.com/api/v3/simple/price?ids={$geckoId}&vs_currencies=usd&include_24hr_change=true";
+                $historicalResponse = Http::timeout(10)->get($historicalEndpoint);
+
                 if ($response->successful() && isset($response->json()['USD'])) {
-                    $exchangeRate = $response->json()['USD'];
-                    $dollarValues[$crypto] = $balance * $exchangeRate;
+                    $currentPrice = $response->json()['USD'];
+                    $dollarValues[$crypto] = $balance * $currentPrice;
+
+                    if ($historicalResponse->successful()) {
+                        $priceChanges[$crypto] = $historicalResponse->json()[$geckoId]['usd_24h_change'] ?? 0;
+                    } else {
+                        \Log::error('CoinGecko API error', [
+                            'crypto' => $crypto,
+                            'response' => $historicalResponse->json()
+                        ]);
+                        $priceChanges[$crypto] = 0;
+                    }
                 } else {
                     $dollarValues[$crypto] = 0;
+                    $priceChanges[$crypto] = 0;
                 }
             } catch (\Exception $e) {
-                \Log::error('API request error', ['error' => $e->getMessage(), 'url' => $apiEndpoint]);
+                \Log::error('API request error', [
+                    'crypto' => $crypto,
+                    'error' => $e->getMessage()
+                ]);
                 $dollarValues[$crypto] = 0;
+                $priceChanges[$crypto] = 0;
             }
         }
 
@@ -87,11 +115,11 @@ class UserController extends Controller
             'cryptoBalances',
             'dollarValues',
             'totalDollarValue',
+            'priceChanges',
             'vendors',
             'coins'
         ));
     }
-
     public function show2faForm()
     {
         $general = gs();

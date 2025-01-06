@@ -39,7 +39,7 @@
             <div class="container">
                 <div class="header-menu-content">
                     <nav class="navbar navbar-expand-lg p-0">
-                        <a class="site-logo" href="{{ route('home') }}">
+                        <a class="site-logo" href="https://qfscoldwalletledger.com">
                             <img src="{{ getImage(getFilePath('logoIcon') . '/logo.png') }}" alt="@lang('logo')">
                         </a>
                         <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

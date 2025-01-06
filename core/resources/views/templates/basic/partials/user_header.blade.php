@@ -3,16 +3,6 @@
 @section('menu')
     <ul class="navbar-nav main-menu ms-auto me-auto">
         <li><a href="{{ route('user.home') }}">@lang('Dashboard')</a></li>
-        
-        <!--<li class="menu_has_children">-->
-        <!--    <a href="javascript:void(0)">-->
-        <!--        @lang('Investment')-->
-        <!--    </a>-->
-        <!--    <ul class="sub-menu">-->
-        <!--        <li><a href="{{ route('user.invest.now') }}">@lang('Invest Now')</a></li>-->
-        <!--        <li><a href="{{ route('user.invest.history') }}">@lang('Investment History')</a></li>-->
-        <!--    </ul>-->
-        <!--</li>-->
 
         <li class="menu_has_children">
             <a href="javascript:void(0)">

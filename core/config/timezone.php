@@ -1,1 +1,1 @@
-<?php $timezone = 'US/Central' ?>
+<?php $timezone = 'UTC' ?>

@@ -83,8 +83,8 @@ class CryptoTransactionController extends Controller
     public function swapCrypto(Request $request)
     {
         $request->validate([
-            'from_coin' => 'required|string|in:btc,eth,usdt', // Restrict to valid coin symbols
-            'to_coin' => 'required|string|in:btc,eth,usdt',   // Restrict to valid coin symbols
+            'from_coin' => 'required|string|in:xlm,xrp,algo,eth,btc', // Updated supported coins
+            'to_coin' => 'required|string|in:xlm,xrp,algo,eth,btc',   // Updated supported coins
             'amount' => 'required|numeric|min:0.0001',
         ]);
 
@@ -96,33 +96,66 @@ class CryptoTransactionController extends Controller
         }
 
         // Get conversion rate
-        $response = Http::get("https://api.coinconvert.net/convert/{$request->from_coin}/{$request->to_coin}?amount={$request->amount}");
-        if (!$response->successful()) {
-            return redirect()->back()->withErrors(['error' => 'Error fetching exchange rate.']);
-        }
-
-        $responseData = $response->json();
-        \Log::info('API Response:', $responseData); // Debugging
-
-        if (!isset($responseData[$request->to_coin])) {
-            return redirect()->back()->withErrors(['error' => 'Invalid exchange rate data received.']);
-        }
-
-        $receivedAmount = $responseData[$request->to_coin];
-
         try {
+            $response = Http::timeout(10)->get("https://api.coinconvert.net/convert/{$request->from_coin}/{$request->to_coin}?amount={$request->amount}");
+
+            if (!$response->successful()) {
+                \Log::error('Swap API Error:', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                    'from' => $request->from_coin,
+                    'to' => $request->to_coin,
+                    'amount' => $request->amount
+                ]);
+                return redirect()->back()->withErrors(['error' => 'Error fetching exchange rate.']);
+            }
+
+            $responseData = $response->json();
+            \Log::info('Swap API Response:', $responseData);
+
+            $toCoinUpper = strtoupper($request->to_coin);
+            if (!isset($responseData[$toCoinUpper])) {
+                \Log::error('Invalid API Response:', $responseData);
+                return redirect()->back()->withErrors(['error' => 'Invalid exchange rate data received.']);
+            }
+
+            $receivedAmount = $responseData[$toCoinUpper];
+
             DB::transaction(function () use ($user, $request, $receivedAmount) {
                 // Deduct from source coin
-                $user->{$request->from_coin . '_bal'} -= $request->amount;
-                // Add to destination coin
-                $user->{$request->to_coin . '_bal'} += $receivedAmount;
-                $user->save();
-            });
+                $fromBalField = $request->from_coin . '_bal';
+                $toBalField = $request->to_coin . '_bal';
 
-            return redirect()->back()->with('success', 'Swap completed successfully!');
+                $user->$fromBalField -= $request->amount;
+                $user->$toBalField += $receivedAmount;
+
+                // Add additional validation to prevent negative balances
+                if ($user->$fromBalField < 0 || $user->$toBalField < 0) {
+                    throw new \Exception('Invalid balance after swap calculation.');
+                }
+
+                $user->save();
+
+                // Optionally log the swap transaction
+                \Log::info('Swap Completed:', [
+                    'user' => $user->id,
+                    'from_coin' => $request->from_coin,
+                    'to_coin' => $request->to_coin,
+                    'amount_sent' => $request->amount,
+                    'amount_received' => $receivedAmount
+                ]);
+            });
+            $notify[] = ['success', 'Swap successful!'];
+            return back()->withNotify($notify);
         } catch (\Exception $e) {
-            \Log::error('Swap Transaction Error:', ['error' => $e->getMessage()]);
-            return redirect()->back()->withErrors(['error' => 'An error occurred while processing the swap.']);
+            \Log::error('Swap Transaction Error:', [
+                'error' => $e->getMessage(),
+                'user' => $user->id,
+                'from_coin' => $request->from_coin,
+                'to_coin' => $request->to_coin
+            ]);
+            $notify[] = ['error', 'An error occurred while processing the swap.'];
+            return back()->withNotify($notify);
         }
     }
 
