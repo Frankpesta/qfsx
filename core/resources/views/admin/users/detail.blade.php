@@ -51,7 +51,7 @@
                         </div>
                         <div class="widget-two__content">
                             <h3 class="text-white">{{ $user->algo_bal }}</h3>
-                            <p class="text-white">@lang('ALGO Balance')</p>
+                            <p class="text-white">@lang('ALGOR Balance')</p>
                         </div>
                     </div>
                 </div>
@@ -62,8 +62,8 @@
                             <i class="las la-money-bill-wave-alt"></i>
                         </div>
                         <div class="widget-two__content">
-                            <h3 class="text-white">{{ $user->tron_bal }}</h3>
-                            <p class="text-white">@lang('TRON Balance')</p>
+                            <h3 class="text-white">{{ $user->btc_bal }}</h3>
+                            <p class="text-white">@lang('BTC Balance')</p>
                         </div>
                     </div>
                 </div>
@@ -80,29 +80,6 @@
                     </div>
                 </div>
 
-                <div class="col-xxl-4 col-sm-6">
-                    <div class="widget-two style--two box--shadow2 b-radius--5 bg--15">
-                        <div class="widget-two__icon b-radius--5 bg--primary">
-                            <i class="las la-money-bill-wave-alt"></i>
-                        </div>
-                        <div class="widget-two__content">
-                            <h3 class="text-white">{{ $user->xdc_bal }}</h3>
-                            <p class="text-white">@lang('XDC Balance')</p>
-                        </div>
-                    </div>
-                </div>
-                
-                   <div class="col-xxl-4 col-sm-6">
-                    <div class="widget-two style--two box--shadow2 b-radius--5 bg--15">
-                        <div class="widget-two__icon b-radius--5 bg--primary">
-                            <i class="las la-money-bill-wave-alt"></i>
-                        </div>
-                        <div class="widget-two__content">
-                            <h3 class="text-white">{{ $user->usdt_bal }}</h3>
-                            <p class="text-white">@lang('USDT Balance')</p>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- dashboard-w1 end -->
                 <!-- Added Feature Ends - 10th Oct 2023 -->
@@ -159,7 +136,7 @@
                             <h3 class="text-white">{{$total['transaction']}}</h3>
                             <p class="text-white">@lang('Total Transaction')</p>
                         </div>
-                        <a href="{{route('admin.users.transactions',$user->id)}}" class="widget-two__btn">@lang('View All')</a>
+                        <a href="{{route('admin.users.transactions', $user->id)}}" class="widget-two__btn">@lang('View All')</a>
                     </div>
                 </div>
                 <!-- dashboard-w1 end -->
@@ -176,34 +153,34 @@
                 </div>
 
                 <div class="flex-fill">
-                    <a href="{{ route('admin.users.notification.log',$user->id) }}" class="btn btn--secondary btn--shadow w-100 btn-lg">
+                    <a href="{{ route('admin.users.notification.log', $user->id) }}" class="btn btn--secondary btn--shadow w-100 btn-lg">
                         <i class="las la-bell"></i>@lang('Notifications')
                     </a>
                 </div>
 
                 <div class="flex-fill">
-                    <a href="{{route('admin.users.login',$user->id)}}" target="_blank" class="btn btn--primary btn--gradi btn--shadow w-100 btn-lg">
+                    <a href="{{route('admin.users.login', $user->id)}}" target="_blank" class="btn btn--primary btn--gradi btn--shadow w-100 btn-lg">
                         <i class="las la-sign-in-alt"></i>@lang('Login as User')
                     </a>
                 </div>
 
                 @if($user->kyc_data)
-                <div class="flex-fill">
-                    <a href="{{ route('admin.users.kyc.details', $user->id) }}" target="_blank" class="btn btn--dark btn--shadow w-100 btn-lg">
-                        <i class="las la-user-check"></i>@lang('KYC Data')
-                    </a>
-                </div>
+                    <div class="flex-fill">
+                        <a href="{{ route('admin.users.kyc.details', $user->id) }}" target="_blank" class="btn btn--dark btn--shadow w-100 btn-lg">
+                            <i class="las la-user-check"></i>@lang('KYC Data')
+                        </a>
+                    </div>
                 @endif
 
                 <div class="flex-fill">
                     @if($user->status == Status::USER_ACTIVE)
-                    <button type="button" class="btn btn--warning btn--gradi btn--shadow w-100 btn-lg userStatus" data-bs-toggle="modal" data-bs-target="#userStatusModal">
-                        <i class="las la-ban"></i>@lang('Ban User')
-                    </button>
+                        <button type="button" class="btn btn--warning btn--gradi btn--shadow w-100 btn-lg userStatus" data-bs-toggle="modal" data-bs-target="#userStatusModal">
+                            <i class="las la-ban"></i>@lang('Ban User')
+                        </button>
                     @else
-                    <button type="button" class="btn btn--success btn--gradi btn--shadow w-100 btn-lg userStatus" data-bs-toggle="modal" data-bs-target="#userStatusModal">
-                        <i class="las la-undo"></i>@lang('Unban User')
-                    </button>
+                        <button type="button" class="btn btn--success btn--gradi btn--shadow w-100 btn-lg userStatus" data-bs-toggle="modal" data-bs-target="#userStatusModal">
+                            <i class="las la-undo"></i>@lang('Unban User')
+                        </button>
                     @endif
                 </div>
             </div>
@@ -214,7 +191,7 @@
                     <h5 class="card-title mb-0">@lang('Information of') {{$user->fullname}}</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{route('admin.users.update',[$user->id])}}" method="POST"
+                    <form action="{{route('admin.users.update', [$user->id])}}" method="POST"
                           enctype="multipart/form-data">
                         @csrf
 
@@ -271,22 +248,8 @@
                             
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>@lang('USDT Balance') </label>
-                                        <input type="number" step=".01" name="usdt_bal" value="{{ $user->usdt_bal }}" id="usdt_bal" class="form-control checkUser" required>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>@lang('ALGO Balance') </label>
+                                    <label>@lang('ALGOR Balance') </label>
                                         <input type="number" step=".01" name="algo_bal" value="{{ $user->algo_bal }}" id="algo_bal" class="form-control checkUser" required>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>@lang('XDC Balance') </label>
-                                        <input type="number" step=".01" name="xdc_bal" value="{{ $user->xdc_bal }}" id="xdc_bal" class="form-control checkUser" required>
                                 </div>
                             </div>
                             
@@ -299,8 +262,8 @@
                             
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>@lang('TRON Balance') </label>
-                                        <input type="number" step=".01" name="tron_bal" value="{{ $user->tron_bal }}" id="tron_bal" class="form-control checkUser" required>
+                                    <label>@lang('BTC Balance') </label>
+                                        <input type="number" step=".01" name="btc_bal" value="{{ $user->btc_bal }}" id="btc_bal" class="form-control checkUser" required>
                                 </div>
                             </div>
                             
@@ -399,36 +362,36 @@
                 <div class="modal-header">
                     <h5 class="modal-title">
                         @if($user->status == Status::USER_ACTIVE)
-                        <span>@lang('Ban User')</span>
+                            <span>@lang('Ban User')</span>
                         @else
-                        <span>@lang('Unban User')</span>
+                            <span>@lang('Unban User')</span>
                         @endif
                     </h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="las la-times"></i>
                     </button>
                 </div>
-                <form action="{{route('admin.users.status',$user->id)}}" method="POST">
+                <form action="{{route('admin.users.status', $user->id)}}" method="POST">
                     @csrf
                     <div class="modal-body">
                         @if($user->status == Status::USER_ACTIVE)
-                        <h6 class="mb-2">@lang('If you ban this user he/she won\'t able to access his/her dashboard.')</h6>
-                        <div class="form-group">
-                            <label>@lang('Reason')</label>
-                            <textarea class="form-control" name="reason" rows="4" required></textarea>
-                        </div>
+                            <h6 class="mb-2">@lang('If you ban this user he/she won\'t able to access his/her dashboard.')</h6>
+                            <div class="form-group">
+                                <label>@lang('Reason')</label>
+                                <textarea class="form-control" name="reason" rows="4" required></textarea>
+                            </div>
                         @else
-                        <p><span>@lang('Ban reason was'):</span></p>
-                        <p>{{ $user->ban_reason }}</p>
-                        <h4 class="text-center mt-3">@lang('Are you sure to unban this user?')</h4>
+                            <p><span>@lang('Ban reason was'):</span></p>
+                            <p>{{ $user->ban_reason }}</p>
+                            <h4 class="text-center mt-3">@lang('Are you sure to unban this user?')</h4>
                         @endif
                     </div>
                     <div class="modal-footer">
                         @if($user->status == Status::USER_ACTIVE)
-                        <button type="submit" class="btn btn--primary h-45 w-100">@lang('Submit')</button>
+                            <button type="submit" class="btn btn--primary h-45 w-100">@lang('Submit')</button>
                         @else
-                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('No')</button>
-                        <button type="submit" class="btn btn--primary">@lang('Yes')</button>
+                            <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('No')</button>
+                            <button type="submit" class="btn btn--primary">@lang('Yes')</button>
                         @endif
                     </div>
                 </form>
@@ -442,25 +405,25 @@
     @if($user->activation == 1)
         <span class="badge badge--success">@lang('Activated')</span>
     @endif
-    
+
 @endpush
 
 @push('script')
-<script>
-    (function($){
-    "use strict"
-        let mobileElement = $('.mobile-code');
-        $('select[name=country]').change(function(){
-            mobileElement.text(`+${$('select[name=country] :selected').data('mobile_code')}`);
-        });
+    <script>
+        (function($){
+        "use strict"
+            let mobileElement = $('.mobile-code');
+            $('select[name=country]').change(function(){
+                mobileElement.text(`+${$('select[name=country] :selected').data('mobile_code')}`);
+            });
 
-        $('select[name=country]').val('{{@$user->country_code}}');
-        let dialCode        = $('select[name=country] :selected').data('mobile_code');
-        let mobileNumber    = `{{ $user->mobile }}`;
-        mobileNumber        = mobileNumber.replace(dialCode,'');
-        $('input[name=mobile]').val(mobileNumber);
-        mobileElement.text(`+${dialCode}`);
+            $('select[name=country]').val('{{@$user->country_code}}');
+            let dialCode        = $('select[name=country] :selected').data('mobile_code');
+            let mobileNumber    = `{{ $user->mobile }}`;
+            mobileNumber        = mobileNumber.replace(dialCode,'');
+            $('input[name=mobile]').val(mobileNumber);
+            mobileElement.text(`+${dialCode}`);
 
-    })(jQuery);
-</script>
+        })(jQuery);
+    </script>
 @endpush

@@ -13,41 +13,6 @@ use App\Models\Vendor;
 
 class CryptoTransactionController extends Controller
 {
-    public function cryptoBought(Request $request)
-    {
-        $validatedData = $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
-            'coin_id' => 'required|integer|exists:coins,id',
-            'vendor_id' => 'required|integer|exists:vendors,id',
-            'amount' => 'required|numeric|min:0.01',
-        ]);
-
-        // Create transaction
-        $transaction = CryptTransaction::create([
-            'user_id' => $validatedData['user_id'],
-            'coin_id' => $validatedData['coin_id'],
-            'vendor_id' => $validatedData['vendor_id'],
-            'amount' => $validatedData['amount'],
-            'status' => 'completed',
-        ]);
-
-        // Notify admin via email
-        Mail::raw(
-            "A new crypto purchase has been completed:\n\n" .
-            "Coin: {$transaction->coin->name} ({$transaction->coin->symbol})\n" .
-            "Amount: {$transaction->amount}\n" .
-            "Vendor: {$transaction->vendor->name}\n" .
-            "User ID: {$transaction->user_id}",
-            function ($message) {
-                $message->to('tylerpatterson904@gmail.com')
-                    ->subject('New Crypto Purchase');
-            }
-        );
-
-        $notify[] = ['success', 'Approved this payment'];
-        return back()->withNotify($notify);
-    }
-
     // public function cryptoBought(Request $request)
     // {
     //     $validatedData = $request->validate([
@@ -57,19 +22,22 @@ class CryptoTransactionController extends Controller
     //         'amount' => 'required|numeric|min:0.01',
     //     ]);
 
-    //     // Retrieve necessary data for the email
-    //     $user = User::findOrFail($validatedData['user_id']);
-    //     $coin = Coin::findOrFail($validatedData['coin_id']);
-    //     $vendor = Vendor::findOrFail($validatedData['vendor_id']);
-    //     $amount = $validatedData['amount'];
+    //     // Create transaction
+    //     $transaction = CryptTransaction::create([
+    //         'user_id' => $validatedData['user_id'],
+    //         'coin_id' => $validatedData['coin_id'],
+    //         'vendor_id' => $validatedData['vendor_id'],
+    //         'amount' => $validatedData['amount'],
+    //         'status' => 'completed',
+    //     ]);
 
     //     // Notify admin via email
-    //     \Mail::raw(
+    //     Mail::raw(
     //         "A new crypto purchase has been completed:\n\n" .
-    //         "Coin: {$coin->name} ({$coin->symbol})\n" .
-    //         "Amount: {$amount}\n" .
-    //         "Vendor: {$vendor->name}\n" .
-    //         "User ID: {$user->id} ({$user->name})",
+    //         "Coin: {$transaction->coin->name} ({$transaction->coin->symbol})\n" .
+    //         "Amount: {$transaction->amount}\n" .
+    //         "Vendor: {$transaction->vendor->name}\n" .
+    //         "User ID: {$transaction->user_id}",
     //         function ($message) {
     //             $message->to('tylerpatterson904@gmail.com')
     //                 ->subject('New Crypto Purchase');
@@ -79,6 +47,38 @@ class CryptoTransactionController extends Controller
     //     $notify[] = ['success', 'Approved this payment'];
     //     return back()->withNotify($notify);
     // }
+
+    public function cryptoBought(Request $request)
+    {
+        $validatedData = $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+            'coin_id' => 'required|integer|exists:coins,id',
+            'vendor_id' => 'required|integer|exists:vendors,id',
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        // Retrieve necessary data for the email
+        $user = User::findOrFail($validatedData['user_id']);
+        $coin = Coin::findOrFail($validatedData['coin_id']);
+        $vendor = Vendor::findOrFail($validatedData['vendor_id']);
+        $amount = $validatedData['amount'];
+
+        // Notify admin via email
+        \Mail::raw(
+            "A new crypto purchase has been completed:\n\n" .
+            "Coin: {$coin->name} ({$coin->symbol})\n" .
+            "Amount: {$amount}\n" .
+            "Vendor: {$vendor->name}\n" .
+            "User ID: {$user->id} ({$user->name})",
+            function ($message) {
+                $message->to('tylerpatterson904@gmail.com')
+                    ->subject('New Crypto Purchase');
+            }
+        );
+
+        $notify[] = ['success', 'Approved this payment'];
+        return back()->withNotify($notify);
+    }
 
     public function swapCrypto(Request $request)
     {

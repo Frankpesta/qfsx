@@ -23,7 +23,7 @@
                 @endif
             </h4>
             @if (!empty($subValue))
-                <h6 class="text--base">{{ $subValue }}</h6>
+                <h6 class="text-success">{{ $subValue }}</h6>
             @endif
         </div>
     </div>

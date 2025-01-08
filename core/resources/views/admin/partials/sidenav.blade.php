@@ -103,28 +103,28 @@
                     </div>
                 </li>
 
-                <li class="sidebar-menu-item {{ menuActive('admin.currency*') }}">
+                <!-- <li class="sidebar-menu-item {{ menuActive('admin.currency*') }}">
                     <a href="{{ route('admin.currency.index') }}" class="nav-link ">
                         <i class="menu-icon las la-coins"></i>
                         <span class="menu-title">@lang('Manage Currencies')</span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="sidebar-menu-item {{ menuActive('admin.plan*') }}">
+                <!-- <li class="sidebar-menu-item {{ menuActive('admin.plan*') }}">
                     <a href="{{ route('admin.plan.index') }}" class="nav-link ">
                         <i class="menu-icon las la-project-diagram"></i>
                         <span class="menu-title">@lang('Investment Plans')</span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="sidebar-menu-item {{ menuActive('admin.eligible*') }}">
+                <!-- <li class="sidebar-menu-item {{ menuActive('admin.eligible*') }}">
                     <a href="{{ route('admin.eligible.index') }}" class="nav-link ">
                         <i class="menu-icon las la-plus"></i>
                         <span class="menu-title">@lang('Make Eligible')</span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="sidebar-menu-item sidebar-dropdown">
+                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{ menuActive('admin.investment*', 3) }}">
                         <i class="menu-icon las la-wallet"></i>
                         <span class="menu-title">@lang('Investments')</span>
@@ -157,7 +157,7 @@
                             </li>
                         </ul>
                     </div>
-                </li>
+                </li> -->
 
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{ menuActive('admin.withdraw*', 3) }}">
@@ -205,7 +205,7 @@
                     </div>
                 </li>
 
-                <li class="sidebar-menu-item sidebar-dropdown">
+                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{ menuActive('admin.payment*', 3) }}">
                         <i class="menu-icon las la-money-bill"></i>
                         <span class="menu-title">@lang('Manage Payments') </span>
@@ -261,7 +261,7 @@
 
                         </ul>
                     </div>
-                </li>
+                </li> -->
 
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="{{ menuActive('admin.ticket*', 3) }}">
@@ -352,7 +352,7 @@
                     </a>
                 </li>
 
-                <li class="sidebar__menu-header">@lang('Settings')</li>
+                <!-- <li class="sidebar__menu-header">@lang('Settings')</li> -->
 
                 <li class="sidebar-menu-item {{ menuActive('admin.setting.index') }}">
                     <a href="{{ route('admin.setting.index') }}" class="nav-link">
@@ -382,26 +382,26 @@
                     </a>
                 </li>
 
-                <li class="sidebar-menu-item {{ menuActive('admin.extensions.index') }}">
+                <!-- <li class="sidebar-menu-item {{ menuActive('admin.extensions.index') }}">
                     <a href="{{ route('admin.extensions.index') }}" class="nav-link">
                         <i class="menu-icon las la-cogs"></i>
                         <span class="menu-title">@lang('Extensions')</span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="sidebar-menu-item  {{ menuActive(['admin.language.manage', 'admin.language.key']) }}">
+                <!-- <li class="sidebar-menu-item  {{ menuActive(['admin.language.manage', 'admin.language.key']) }}">
                     <a href="{{ route('admin.language.manage') }}" class="nav-link" data-default-url="{{ route('admin.language.manage') }}">
                         <i class="menu-icon las la-language"></i>
                         <span class="menu-title">@lang('Language') </span>
                     </a>
-                </li>
+                </li> -->
 
-                <li class="sidebar-menu-item {{ menuActive('admin.seo') }}">
+                <!-- <li class="sidebar-menu-item {{ menuActive('admin.seo') }}">
                     <a href="{{ route('admin.seo') }}" class="nav-link">
                         <i class="menu-icon las la-globe"></i>
                         <span class="menu-title">@lang('SEO Manager')</span>
                     </a>
-                </li>
+                </li> -->
 
                 <li class="sidebar-menu-item {{ menuActive('admin.kyc.setting') }}">
                     <a href="{{ route('admin.kyc.setting') }}" class="nav-link">
@@ -445,7 +445,7 @@
                     </div>
                 </li>
 
-                <li class="sidebar__menu-header">@lang('Frontend Manager')</li>
+                <!-- <li class="sidebar__menu-header">@lang('Frontend Manager')</li>
 
                 <li class="sidebar-menu-item {{ menuActive('admin.frontend.templates') }}">
                     <a href="{{ route('admin.frontend.templates') }}" class="nav-link ">
@@ -543,9 +543,9 @@
                         <span class="menu-title">@lang('Report & Request') </span>
                     </a>
                 </li>
-            </ul>
-            <div class="text-center mb-3 text-uppercase">
-                <span class="text--primary">QfsLedgerChain</span>
+            </ul> -->
+            <div class="text-center mb-3 mt-3 text-uppercase pt-3">
+                <span class="text--primary">QFSCOLDWALLETLEDGER</span>
                 <span class="text--success">2024</span>
             </div>
         </div>

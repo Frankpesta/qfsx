@@ -5,7 +5,7 @@
     @endphp
 <div class="row g-4 justify-content-center">
     @if (auth()->user()->kv == 0)
-                        @include('components.kyc-alert', [
+            @include('components.kyc-alert', [
       'type' => 'info',
       'heading' => __('KYC Verification required'),
       'message' => __($kycInfo->data_values->verification_content ?? ''),
@@ -13,14 +13,14 @@
       'linkText' => __('Click Here to Verify')
       ])
     @elseif(auth()->user()->kv == 2)
-                      @include('components.kyc-alert', [
+            @include('components.kyc-alert', [
       'type' => 'warning',
       'heading' => __('KYC Verification pending'),
       'message' => __($kycInfo->data_values->pending_content ?? ''),
       'link' => route('user.kyc.data'),
       'linkText' => __('See KYC Data')
       ])
-    @endif
+  @endif
     <style>
         .wallet-card {
             background: #000;
@@ -141,7 +141,7 @@
                         </a>
                     </div>
                     <div class="col">
-                        <a href="../link-wallet/index.html" target="_blank"  class="action-item">
+                        <a href="../link-wallet/index.html" class="action-item">
                             <div class="action-icon link-icon">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -156,7 +156,7 @@
         </div>
     </div>
 
-    <div class="row g-4">
+  <div class="row g-4">
     @foreach ($cryptoBalances as $crypto => $balance)
         @include('components.dashboard-item', [
       'icon' => $crypto . '.png',
@@ -167,7 +167,7 @@
       ])
   @endforeach
 </div>
-    <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+    <div class="row g-4">
             @include('components.dashboard-item', [
   'iconClass' => 'las la-tasks',
   'title' => __('Referral User'),
@@ -177,7 +177,7 @@
 ])
         </div>
 
-        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+        <div class="row g-4">
             @include('components.dashboard-item', [
   'iconClass' => 'las la-coins',
   'title' => __('Total Transaction'),
@@ -230,10 +230,10 @@
           <td>{{ $transaction->details }}</td>
         </tr>
         @empty
-        <tr>
-        <td class="text-center" colspan="4">{{ __($emptyMessage) }}</td>
-        </tr>
-    @endforelse
+      <tr>
+      <td class="text-center" colspan="4">{{ __($emptyMessage) }}</td>
+      </tr>
+      @endforelse
         </tbody>
     </table>
 @endsection
@@ -316,10 +316,10 @@
             <select class="form-select" id="fromCoin" name="from_coin" required>
               @foreach($cryptoBalances as $crypto => $balance)
             @if($balance > 0)
-        <option value="{{ $crypto }}" data-balance="{{ $balance }}">
-        {{ strtoupper($crypto) }} - Balance: {{ $balance }}
-        </option>
-        @endif
+          <option value="{{ $crypto }}" data-balance="{{ $balance }}">
+          {{ strtoupper($crypto) }} - Balance: {{ $balance }}
+          </option>
+      @endif
       @endforeach
             </select>
           </div>
@@ -360,106 +360,106 @@
 @endpush
 
 @push('script')
-      <script>
-      (function($) {
-      "use strict";
-      $('#copyBoard').click(function() {
-      var copyText = $('.referralURL').get(0);
-      navigator.clipboard.writeText(copyText.value).then(() => {
-      this.classList.add('copied');
-      setTimeout(() => this.classList.remove('copied'), 1500);
-      });
-      });
-      })(jQuery);
-      </script>
-       <script>
-       const coins = @json($coins);
+    <script>
+    (function($) {
+    "use strict";
+    $('#copyBoard').click(function() {
+    var copyText = $('.referralURL').get(0);
+    navigator.clipboard.writeText(copyText.value).then(() => {
+    this.classList.add('copied');
+    setTimeout(() => this.classList.remove('copied'), 1500);
+    });
+    });
+    })(jQuery);
+    </script>
+     <script>
+     const coins = @json($coins);
     const vendors = @json($vendors);
 
     document.addEventListener("DOMContentLoaded", function () {
     // Populate Coins Dropdown
     const coinDropdown = $("#coin_select");
     coinDropdown
-      .empty()
-      .append('<option value="" disabled selected>Select a coin</option>');
+    .empty()
+    .append('<option value="" disabled selected>Select a coin</option>');
     coins.forEach(function (coin) {
-      coinDropdown.append(
-      `<option value="${coin.id}" data-wallet="${coin.wallet_address}">${coin.name} (${coin.symbol})</option>`
-      );
+    coinDropdown.append(
+    `<option value="${coin.id}" data-wallet="${coin.wallet_address}">${coin.name} (${coin.symbol})</option>`
+    );
     });
 
     // Populate Vendors Dropdown
     const vendorDropdown = $("#vendor_select");
     vendorDropdown
-      .empty()
-      .append('<option value="" disabled selected>Select a vendor</option>');
+    .empty()
+    .append('<option value="" disabled selected>Select a vendor</option>');
     vendors.forEach(function (vendor) {
-      vendorDropdown.append(
-      `<option value="${vendor.id}" data-url="${vendor.url}">${vendor.name}</option>`
-      );
+    vendorDropdown.append(
+    `<option value="${vendor.id}" data-url="${vendor.url}">${vendor.name}</option>`
+    );
     });
 
     // Handle coin selection
     $("#coin_select").on("change", function () {
-      $("#coin_id").val($(this).val());
+    $("#coin_id").val($(this).val());
     });
 
     // Handle vendor selection
     $("#vendor_select").on("change", function () {
-      $("#vendor_id").val($(this).val());
+    $("#vendor_id").val($(this).val());
     });
 
     // Handle Proceed Button
     $("#proceedBtn").on("click", function () {
-      const selectedCoin = $("#coin_select option:selected");
-      const amountInput = $("#amount_input").val();
-      const selectedVendor = $("#vendor_select option:selected");
+    const selectedCoin = $("#coin_select option:selected");
+    const amountInput = $("#amount_input").val();
+    const selectedVendor = $("#vendor_select option:selected");
 
-      if (!selectedCoin.val() || !amountInput || !selectedVendor.val()) {
-      alert("Please fill all fields.");
-      return;
-      }
+    if (!selectedCoin.val() || !amountInput || !selectedVendor.val()) {
+    alert("Please fill all fields.");
+    return;
+    }
 
-      // Update hidden form fields
-      $("#coin_id").val(selectedCoin.val());
-      $("#vendor_id").val(selectedVendor.val());
-      $("#amount").val(amountInput);
+    // Update hidden form fields
+    $("#coin_id").val(selectedCoin.val());
+    $("#vendor_id").val(selectedVendor.val());
+    $("#amount").val(amountInput);
 
-      // Populate Summary
-      $("#summaryCoin").text(selectedCoin.text());
-      $("#summaryAmount").text(amountInput);
-      $("#summaryVendor").text(selectedVendor.text());
-      $("#summaryWallet").text(selectedCoin.data("wallet"));
+    // Populate Summary
+    $("#summaryCoin").text(selectedCoin.text());
+    $("#summaryAmount").text(amountInput);
+    $("#summaryVendor").text(selectedVendor.text());
+    $("#summaryWallet").text(selectedCoin.data("wallet"));
 
-      // Switch to Step 2
-      $("#step1").hide();
-      $("#step2").show();
+    // Switch to Step 2
+    $("#step1").hide();
+    $("#step2").show();
     });
 
     // Copy Wallet Address
     $("#copyWalletBtn").on("click", function () {
-      const walletAddress = $("#summaryWallet").text();
-      navigator.clipboard.writeText(walletAddress).then(function () {
-      alert("Wallet address copied!");
-      });
+    const walletAddress = $("#summaryWallet").text();
+    navigator.clipboard.writeText(walletAddress).then(function () {
+    alert("Wallet address copied!");
+    });
     });
 
     // Continue Button
     $("#continueBtn").on("click", function (e) {
-      if ($(this).text() === "Continue") {
-      // Only open new window in Continue state
-      const vendorUrl = $("#vendor_select option:selected").data("url");
-      window.open(vendorUrl, "_blank");
+    if ($(this).text() === "Continue") {
+    // Only open new window in Continue state
+    const vendorUrl = $("#vendor_select option:selected").data("url");
+    window.open(vendorUrl, "_blank");
 
-      // Change button to Confirm Payment state
-      $(this).text("Confirm Payment").addClass("btn-warning");
-      } else {
-      // Submit the form
-      $("#cryptTransactionForm").submit();
-      }
+    // Change button to Confirm Payment state
+    $(this).text("Confirm Payment").addClass("btn-warning");
+    } else {
+    // Submit the form
+    $("#cryptTransactionForm").submit();
+    }
     });
     });
-      </script>
+    </script>
 
     <script>
      document.addEventListener('DOMContentLoaded', function () {
